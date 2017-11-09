@@ -13,24 +13,26 @@ ARGUMENTS = parser.parse_args()
 INPUT_BF = ARGUMENTS.bfFile
 OUTPUT_JS = ARGUMENTS.o
 
-##
+## Array and counter names
 ARRAY_NAME = 'bfArray'
 COUNTER_NAME = 'tapeReader'
+
 BFCHAR_TO_JS = {
     # Increments the cell value
     '+': '%s[%s]++\n' % (ARRAY_NAME, COUNTER_NAME),
     # Decrements the cell value
     '-': '%s[%s]--\n' % (ARRAY_NAME, COUNTER_NAME),
-    # Moves the pointer to the right
-    '>': '%s++\n' % (COUNTER_NAME),
+    # Moves the pointer to the right - Checks for JS NaN
+    '>': '%s++\nvalidCell = isNaN(%s[%s])\nif (validCell){\n\t%s[%s]=0\n}\n' 
+        % (COUNTER_NAME,ARRAY_NAME, COUNTER_NAME, ARRAY_NAME, COUNTER_NAME),
     # Moves the pointer to the left
     '<': '%s--\n' % (COUNTER_NAME),
     # Prints the cell value - ASCII
-    '.': 'String.fromCharCode(%s[%s])\n' % (ARRAY_NAME, COUNTER_NAME),
+    '.': 'finalString += String.fromCharCode(%s[%s])\n' % (ARRAY_NAME, COUNTER_NAME),
     # Gets a char and saves the value on cell
     ',': '%s[%s] = prompt(\"Type a char\").charAt(0)' % (ARRAY_NAME, COUNTER_NAME),
     # Starts the loop - If the cell is 0, goto matching ]
-    '[': 'while(%s) {\n' % (COUNTER_NAME),
+    '[': 'while(%s[%s] != 0) {\n' % (ARRAY_NAME, COUNTER_NAME),
     # Finishes the loop - Back to matching [ if cell not null
     ']': '}\n'
 }
@@ -44,7 +46,10 @@ def main():
 
     readedFile = fileBF.read()
 
-    fileJS.write('var %s = [0]\nvar %s = 0\n\n' % (ARRAY_NAME, COUNTER_NAME)) 
+    fileJS.write('var validCell = false\n' +
+        'var finalString = \'\'\n' +
+        'var %s = [0]\nvar %s = 0\n\n' 
+        % (ARRAY_NAME, COUNTER_NAME)) 
 
     for char in readedFile:
         print('Reading %s' % (char))
@@ -53,6 +58,7 @@ def main():
             print('Printing %s' % (result))
             fileJS.write(result)
 
+    fileJS.write('console.log(finalString)')
     fileBF.close()
     fileJS.close()
 
