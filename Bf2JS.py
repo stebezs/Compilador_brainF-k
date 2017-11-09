@@ -44,6 +44,8 @@ def main():
 
     readedFile = fileBF.read()
 
+    fileJS.write('var %s = [0]\nvar %s = 0\n\n' % (ARRAY_NAME, COUNTER_NAME)) 
+
     for char in readedFile:
         print('Reading %s' % (char))
         if char in BFCHAR_TO_JS:
