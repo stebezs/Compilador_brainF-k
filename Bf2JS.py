@@ -26,7 +26,7 @@ BFCHAR_TO_JS = {
     # Moves the pointer to the left
     '<': '%s--\n' % (COUNTER_NAME),
     # Prints the cell value - ASCII
-    '.': 'String.fromCharCode(%s[%s])\n' % (ARRAY_NAME, COUNTER_NAME), 
+    '.': 'String.fromCharCode(%s[%s])\n' % (ARRAY_NAME, COUNTER_NAME),
     # Gets a char and saves the value on cell
     ',': '%s[%s] = prompt(\"Type a char\").charAt(0)' % (ARRAY_NAME, COUNTER_NAME),
     # Starts the loop - If the cell is 0, goto matching ]
@@ -38,5 +38,20 @@ BFCHAR_TO_JS = {
 # This is the main function
 def main():
     print ('Initializing parser BF-2-JS')
+
+    fileBF = open(INPUT_BF, 'r')
+    fileJS = open(OUTPUT_JS, 'w')
+
+    readedFile = fileBF.read()
+
+    for char in readedFile:
+        print('Reading %s' % (char))
+        if char in BFCHAR_TO_JS:
+            result = BFCHAR_TO_JS[char]
+            print('Printing %s' % (result))
+            fileJS.write(result)
+
+    fileBF.close()
+    fileJS.close()
 
 main()
